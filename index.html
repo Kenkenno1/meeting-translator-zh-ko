@@ -835,12 +835,12 @@
         <div class="settings-prompt" id="settingsPrompt">請輸入 OpenAI API Key</div>
         <div class="field">
           <label for="apiKey">OpenAI API Key</label>
-          <input class="in" id="apiKey" type="password" placeholder="sk-...（從 OpenAI 取得）" autocomplete="off" autocapitalize="off" spellcheck="false" />
+          <input class="in" id="apiKey" type="password" placeholder="sk-..." autocomplete="off" autocapitalize="off" spellcheck="false" />
           <label class="checkline" for="rememberApiKey">
             <input id="rememberApiKey" type="checkbox" />
             <span>在此裝置記住 API Key</span>
           </label>
-          <div class="hint"><span id="apiKeyStorageHint">未勾選時只保存在目前分頁。</span><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">尚未有 Key？前往 OpenAI 申請 →</a></div>
+          <div class="hint"><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">沒有 Key？前往 OpenAI 申請 →</a></div>
         </div>
         <button class="btn-verify" id="btnVerify" disabled>
           <span class="verify-dot"></span>
@@ -1822,21 +1822,21 @@
 
     function setApiKeyOnlyMode(enabled) {
       el.settingsOverlay.classList.toggle('api-key-only', enabled);
-      if (el.settingsTitle) el.settingsTitle.textContent = enabled ? '開始使用前，請輸入 API Key' : '設定';
+      if (el.settingsTitle) el.settingsTitle.textContent = enabled ? '輸入 API Key' : '設定';
       if (el.settingsPrompt) {
         el.settingsPrompt.textContent = enabled
-          ? '本服務使用您自己的 OpenAI API Key。Key 只保存在此瀏覽器，不會傳到我們的伺服器。'
+          ? 'Key 只會保存在此瀏覽器。'
           : '請輸入 OpenAI API Key';
         el.settingsPrompt.style.display = enabled || !state.apiKey ? '' : 'none';
       }
       if (el.apiKeyStorageHint) {
         el.apiKeyStorageHint.textContent = enabled
-          ? 'Key 將保存在此瀏覽器，不會傳到我們的伺服器。'
+          ? 'Key 只會保存在此瀏覽器。'
           : '未勾選時只保存在目前分頁。';
       }
       const verifyLabel = el.btnVerify?.querySelector('.verify-label');
       if (verifyLabel && !el.btnVerify.classList.contains('verifying')) {
-        verifyLabel.textContent = enabled ? '驗證並開始使用' : '驗證連線';
+        verifyLabel.textContent = enabled ? '開始使用' : '驗證連線';
       }
     }
 
@@ -1924,7 +1924,7 @@
         clearTimeout(verifyTimeout);
         el.btnVerify.classList.remove('verifying');
         const apiKeyOnly = el.settingsOverlay.classList.contains('api-key-only');
-        el.btnVerify.querySelector('.verify-label').textContent = apiKeyOnly ? '驗證並開始使用' : '驗證連線';
+        el.btnVerify.querySelector('.verify-label').textContent = apiKeyOnly ? '開始使用' : '驗證連線';
       }
     });
 
