@@ -326,6 +326,70 @@
     }
     .btn-text:disabled{opacity:0.35;cursor:not-allowed}
 
+    .line-shell-banner{
+      position:fixed;
+      inset:0;
+      z-index:9997;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:rgba(0,0,0,0.72);
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
+    }
+    .line-shell-banner[hidden]{display:none}
+    .line-shell-panel{
+      width:min(560px, 100%);
+      display:grid;
+      gap:14px;
+      padding:18px;
+      border:1px solid var(--micBd);
+      border-radius:16px;
+      background:linear-gradient(180deg, var(--panel), var(--panel2));
+      color:var(--text);
+      box-shadow:0 10px 28px rgba(0,0,0,0.32);
+    }
+    .line-shell-banner-title{
+      font-size:18px;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+    .line-shell-banner-body{
+      font-size:14px;
+      line-height:1.5;
+      color:var(--muted);
+    }
+    .line-shell-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .line-shell-actions button{
+      min-height:40px;
+      border:1px solid var(--chipBd);
+      border-radius:12px;
+      padding:8px 10px;
+      background:var(--chipBg);
+      color:var(--text);
+      font:inherit;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .line-shell-actions button:first-child{
+      border-color:var(--accentBd);
+      background:var(--accentBg);
+      color:var(--accent);
+    }
+    .line-shell-actions button:active{transform:scale(0.98)}
+    @media(max-width:640px){
+      .line-shell-actions{justify-content:stretch}
+      .line-shell-actions button{flex:1 1 120px}
+    }
+
     .btn-mic.mic-pending{
       border-color:rgba(220,38,38,0.4);
       background:linear-gradient(135deg,rgba(220,38,38,0.25) 0%,rgba(239,68,68,0.30) 50%,rgba(220,38,38,0.25) 100%);
@@ -543,6 +607,21 @@
       margin-bottom:20px;
       font-weight:500;
     }
+    .api-key-section{display:grid;gap:10px}
+    .advanced-settings-section{display:block}
+    #settingsOverlay.api-key-only .settings-modal{max-width:440px}
+    #settingsOverlay.api-key-only .settings-header{justify-content:center;text-align:center;margin-bottom:16px}
+    #settingsOverlay.api-key-only .settings-title{text-align:center}
+    #settingsOverlay.api-key-only #btnCloseSettings{display:none}
+    #settingsOverlay.api-key-only .advanced-settings-section{display:none}
+    #settingsOverlay.api-key-only .checkline{display:none}
+    #settingsOverlay.api-key-only .field{
+      background:transparent;
+      border:0;
+      padding:0;
+      margin-top:0;
+    }
+    #settingsOverlay.api-key-only .btn-verify{margin-top:4px}
     .field{
       display:grid;
       gap:6px;
@@ -752,31 +831,35 @@
         <div class="settings-title">設定</div>
         <button class="modal-close" id="btnCloseSettings">關閉</button>
       </div>
-      <div class="settings-prompt" id="settingsPrompt">請輸入 OpenAI API Key</div>
-      <div class="field">
-        <label for="apiKey">OpenAI API Key</label>
-        <input class="in" id="apiKey" type="password" placeholder="sk-…" autocomplete="off" autocapitalize="off" spellcheck="false" />
-        <label class="checkline" for="rememberApiKey">
-          <input id="rememberApiKey" type="checkbox" />
-          <span>在此裝置記住 API Key</span>
-        </label>
-        <div class="hint">未勾選時只保存在目前分頁。<a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">前往 OpenAI 申請 API Key →</a></div>
+      <div class="api-key-section">
+        <div class="settings-prompt" id="settingsPrompt">請輸入 OpenAI API Key</div>
+        <div class="field">
+          <label for="apiKey">OpenAI API Key</label>
+          <input class="in" id="apiKey" type="password" placeholder="sk-...（從 OpenAI 取得）" autocomplete="off" autocapitalize="off" spellcheck="false" />
+          <label class="checkline" for="rememberApiKey">
+            <input id="rememberApiKey" type="checkbox" />
+            <span>在此裝置記住 API Key</span>
+          </label>
+          <div class="hint"><span id="apiKeyStorageHint">未勾選時只保存在目前分頁。</span><a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">尚未有 Key？前往 OpenAI 申請 →</a></div>
+        </div>
+        <button class="btn-verify" id="btnVerify" disabled>
+          <span class="verify-dot"></span>
+          <span class="verify-label">驗證連線</span>
+        </button>
+        <div class="verify-result" id="verifyResult"></div>
       </div>
-      <button class="btn-verify" id="btnVerify" disabled>
-        <span class="verify-dot"></span>
-        <span class="verify-label">驗證連線</span>
-      </button>
-      <div class="verify-result" id="verifyResult"></div>
-      <hr style="border:none;border-top:1px solid var(--border);margin:16px 0" />
-      <div class="field">
-        <label for="glossaryInput">術語表（每行一組：原文 | 譯文）</label>
-        <textarea class="in" id="glossaryInput" rows="4" placeholder="例：專案 | プロジェクト&#10;預算 | 予算" style="resize:vertical;font-size:13px;line-height:1.6"></textarea>
-        <div class="hint">翻譯時會強制使用指定術語，建議 20-50 組以內</div>
-      </div>
-      <div class="field">
-        <label for="meetingContextInput">會前上下文（選填）</label>
-        <textarea class="in" id="meetingContextInput" rows="3" placeholder="貼入會議議程、主題或背景資訊，翻譯時會參考此上下文" style="resize:vertical;font-size:13px;line-height:1.6"></textarea>
-        <div class="hint">提供會議背景可提升翻譯準確度</div>
+      <div class="advanced-settings-section">
+        <hr style="border:none;border-top:1px solid var(--border);margin:16px 0" />
+        <div class="field">
+          <label for="glossaryInput">術語表（每行一組：原文 | 譯文）</label>
+          <textarea class="in" id="glossaryInput" rows="4" placeholder="例：專案 | プロジェクト&#10;預算 | 予算" style="resize:vertical;font-size:13px;line-height:1.6"></textarea>
+          <div class="hint">翻譯時會強制使用指定術語，建議 20-50 組以內</div>
+        </div>
+        <div class="field">
+          <label for="meetingContextInput">會前上下文（選填）</label>
+          <textarea class="in" id="meetingContextInput" rows="3" placeholder="貼入會議議程、主題或背景資訊，翻譯時會參考此上下文" style="resize:vertical;font-size:13px;line-height:1.6"></textarea>
+          <div class="hint">提供會議背景可提升翻譯準確度</div>
+        </div>
       </div>
     </div>
   </div>
@@ -855,6 +938,19 @@
     <!-- Toolbar buttons moved to top bar -->
   </div>
 
+  <div class="line-shell-banner" id="lineShellBanner" hidden>
+    <div class="line-shell-panel" role="dialog" aria-modal="true" aria-labelledby="lineShellTitle">
+      <div>
+        <div class="line-shell-banner-title" id="lineShellTitle">請用瀏覽器開啟口譯 APP</div>
+        <div class="line-shell-banner-body">LINE 內建瀏覽器無法穩定使用語音輸入。系統會嘗試幫你開啟 Chrome / Safari；若沒有自動開啟，請按下方按鈕。</div>
+      </div>
+      <div class="line-shell-actions">
+        <button type="button" id="btnLineOpenExternal">用瀏覽器開啟</button>
+        <button type="button" id="btnLineCopyLink">複製連結</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toastHost"></div>
 
   <script>
@@ -887,11 +983,35 @@
       MAX_SUMMARY_TRANSCRIPT_CHARS: 18000,
       MAX_OFFLINE_QUEUE: 30,
       PRE_EDIT_MIN_CHARS: 18,
+      ALWAYS_DISABLE_MIC_IN_LINE: true,
+      LINE_EXTERNAL_AUTO_KEY: 'meeting_line_external_open_attempted_v2',
     };
 
     function isMobile() {
       return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
         || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+    }
+
+    function runtimeShellInfo() {
+      const ua = navigator.userAgent || '';
+      const platform = navigator.userAgentData?.platform || navigator.platform || '';
+      const maxTouchPoints = Number(navigator.maxTouchPoints) || 0;
+      const androidUa = /Android/i.test(ua) || /Android/i.test(platform);
+      const linuxTouchChrome = /Linux/i.test(ua) && /(Chrome|Chromium|SamsungBrowser)/i.test(ua) && maxTouchPoints > 0;
+      const iosLike = /iPhone|iPad|iPod/i.test(ua) || (maxTouchPoints > 1 && /Macintosh/i.test(ua));
+      return {
+        ua,
+        platform,
+        maxTouchPoints,
+        isLine: /Line\//i.test(ua),
+        isAndroidLike: androidUa || linuxTouchChrome,
+        isIosLike: iosLike,
+      };
+    }
+
+    const shellInfo = runtimeShellInfo();
+    function shouldDisableMicForShell() {
+      return CONFIG.ALWAYS_DISABLE_MIC_IN_LINE && shellInfo.isLine;
     }
 
     const STORAGE_KEYS = {
@@ -1279,12 +1399,17 @@
       btnVerify: $('btnVerify'),
       verifyResult: $('verifyResult'),
       settingsPrompt: $('settingsPrompt'),
+      settingsTitle: document.querySelector('#settingsOverlay .settings-title'),
+      apiKeyStorageHint: $('apiKeyStorageHint'),
       btnTheme: $('btnTheme'),
       // Zones
       btnMicTw: $('btnMicTw'),
       btnMicJp: $('btnMicJp'),
       btnTextTw: $('btnTextTw'),
       btnTextJp: $('btnTextJp'),
+      lineShellBanner: $('lineShellBanner'),
+      btnLineOpenExternal: $('btnLineOpenExternal'),
+      btnLineCopyLink: $('btnLineCopyLink'),
       displayTw: $('displayTw'),
       displayJp: $('displayJp'),
       translatedTw: $('translatedTw'),
@@ -1405,6 +1530,60 @@
       setTimeout(dismiss, durationMs || CONFIG.TOAST_MS);
     }
     function toastError(msg) { toast(msg, 'error', 5000); }
+
+    function getCleanAppUrl() {
+      const url = new URL(location.href);
+      ['srdebug', 'lineHarness', 'p0'].forEach(key => url.searchParams.delete(key));
+      return url.toString();
+    }
+
+    function buildAndroidIntentUrl(url) {
+      const target = new URL(url);
+      const path = `${target.host}${target.pathname}${target.search}${target.hash}`;
+      const fallback = encodeURIComponent(url);
+      return `intent://${path}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${fallback};end`;
+    }
+
+    async function copyLinkBestEffort(url) {
+      try {
+        await copyText(url);
+        toast('已複製連結，請貼到 Chrome / Safari 開啟');
+        return true;
+      } catch {
+        try {
+          window.prompt('請長按複製連結，並貼到 Chrome / Safari 開啟', url);
+        } catch {}
+        toast('無法自動複製，請手動複製連結');
+        return false;
+      }
+    }
+
+    function showLineShellBanner(options = {}) {
+      if (!el.lineShellBanner || !shellInfo.isLine) return;
+      el.lineShellBanner.hidden = false;
+    }
+
+    async function openExternalBestEffort(options = {}) {
+      const url = getCleanAppUrl();
+      if (shellInfo.isAndroidLike) {
+        if (!options.auto) toast('正在嘗試開啟 Chrome');
+        location.href = buildAndroidIntentUrl(url);
+        return;
+      }
+      await copyLinkBestEffort(url);
+      toast('請使用 LINE 右上角選單在 Safari / 瀏覽器開啟');
+    }
+
+    function tryAutoOpenExternalFromLine() {
+      if (!shellInfo.isLine || !shellInfo.isAndroidLike) return;
+      if (ssGet(CONFIG.LINE_EXTERNAL_AUTO_KEY, '0') === '1') return;
+      ssSet(CONFIG.LINE_EXTERNAL_AUTO_KEY, '1');
+      setTimeout(() => {
+        if (document.visibilityState === 'visible') {
+          openExternalBestEffort({ auto: true });
+        }
+      }, 80);
+    }
 
     function clearTranslationUi() {
       el.displayTw.classList.remove('loading');
@@ -1637,19 +1816,46 @@
     });
 
     // ========== Settings ==========
-    el.btnSettings.addEventListener('click', () => openSettings(true));
+    el.btnSettings.addEventListener('click', () => openSettings(true, { apiKeyOnly: false }));
     el.btnCloseSettings.addEventListener('click', () => openSettings(false));
     el.settingsOverlay.addEventListener('click', e => { if (e.target === el.settingsOverlay) openSettings(false); });
 
-    function openSettings(show) {
+    function setApiKeyOnlyMode(enabled) {
+      el.settingsOverlay.classList.toggle('api-key-only', enabled);
+      if (el.settingsTitle) el.settingsTitle.textContent = enabled ? '開始使用前，請輸入 API Key' : '設定';
+      if (el.settingsPrompt) {
+        el.settingsPrompt.textContent = enabled
+          ? '本服務使用您自己的 OpenAI API Key。Key 只保存在此瀏覽器，不會傳到我們的伺服器。'
+          : '請輸入 OpenAI API Key';
+        el.settingsPrompt.style.display = enabled || !state.apiKey ? '' : 'none';
+      }
+      if (el.apiKeyStorageHint) {
+        el.apiKeyStorageHint.textContent = enabled
+          ? 'Key 將保存在此瀏覽器，不會傳到我們的伺服器。'
+          : '未勾選時只保存在目前分頁。';
+      }
+      const verifyLabel = el.btnVerify?.querySelector('.verify-label');
+      if (verifyLabel && !el.btnVerify.classList.contains('verifying')) {
+        verifyLabel.textContent = enabled ? '驗證並開始使用' : '驗證連線';
+      }
+    }
+
+    function openSettings(show, options = {}) {
       toggleOverlay(el.settingsOverlay, show);
       if (show) {
+        const apiKeyOnly = !!options.apiKeyOnly;
+        if (apiKeyOnly) {
+          state.rememberApiKey = true;
+          el.rememberApiKey.checked = true;
+          storeApiKey(state.apiKey, state.rememberApiKey);
+        }
+        setApiKeyOnlyMode(apiKeyOnly);
         el.apiKey.focus();
         el.verifyResult.textContent = '';
         el.verifyResult.className = 'verify-result';
-        el.settingsPrompt.style.display = state.apiKey ? 'none' : '';
       } else {
         storeApiKey(state.apiKey, state.rememberApiKey);
+        setApiKeyOnlyMode(false);
       }
     }
     el.apiKey.addEventListener('input', e => {
@@ -1698,7 +1904,7 @@
           break; // other errors (401, 429, 5xx) — stop
         }
         if (okModel) {
-          el.verifyResult.textContent = '✓ 連線成功';
+          el.verifyResult.textContent = '✓ 驗證成功';
           el.verifyResult.className = 'verify-result success';
           _modelCache.translate = okModel; // prime cache with the working model
           storeApiKey(state.apiKey, state.rememberApiKey);
@@ -1717,7 +1923,8 @@
       } finally {
         clearTimeout(verifyTimeout);
         el.btnVerify.classList.remove('verifying');
-        el.btnVerify.querySelector('.verify-label').textContent = '驗證連線';
+        const apiKeyOnly = el.settingsOverlay.classList.contains('api-key-only');
+        el.btnVerify.querySelector('.verify-label').textContent = apiKeyOnly ? '驗證並開始使用' : '驗證連線';
       }
     });
 
@@ -2532,6 +2739,8 @@ Your task:
 
     // ========== Speech Recognition ==========
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const micDisabledByShell = shouldDisableMicForShell();
+    const speechUnavailable = !SpeechRecognition || micDisabledByShell;
     let activeRecognition = null;
     let activeMicSpeaker = null; // 'TW' | 'KR'
     let _micDelayTimer = null;
@@ -2549,16 +2758,21 @@ Your task:
       return { ua, platform, maxTouchPoints, isAndroidLike: androidUa || linuxTouchChrome };
     }
 
-    if (!SpeechRecognition) {
+    if (speechUnavailable) {
       el.btnMicTw.disabled = true;
       el.btnMicJp.disabled = true;
       el.btnTextTw.classList.add('primary');
       el.btnTextJp.classList.add('primary');
-      const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-      if (isStandalone && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
-        toast('語音輸入需在 Safari 中使用，PWA 模式暫不支援');
+      if (micDisabledByShell) {
+        showLineShellBanner();
+        tryAutoOpenExternalFromLine();
       } else {
-        toast('此瀏覽器不支援語音辨識，可手動輸入文字翻譯');
+        const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+        if (isStandalone && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+          toast('語音輸入需在 Safari 中使用，PWA 模式暫不支援');
+        } else {
+          toast('此瀏覽器不支援語音辨識，可手動輸入文字翻譯');
+        }
       }
     }
 
@@ -2566,10 +2780,17 @@ Your task:
     el.btnMicJp.addEventListener('click', () => toggleMic('KR'));
     el.btnTextTw.addEventListener('click', () => toggleText('TW'));
     el.btnTextJp.addEventListener('click', () => toggleText('KR'));
+    el.btnLineOpenExternal?.addEventListener('click', openExternalBestEffort);
+    el.btnLineCopyLink?.addEventListener('click', () => copyLinkBestEffort(getCleanAppUrl()));
 
     function toggleMic(speaker) {
+      if (micDisabledByShell) {
+        showLineShellBanner({ force: true });
+        toast('LINE 內建瀏覽器無法穩定使用語音輸入，請用瀏覽器開啟或使用文字輸入');
+        return;
+      }
       if (!SpeechRecognition) {
-        toast('此瀏覽器不支援語音辨識，請使用打字輸入');
+        toast('此瀏覽器不支援語音辨識，可使用文字輸入');
         return;
       }
 
@@ -2591,6 +2812,11 @@ Your task:
     }
 
     async function startMic(speaker) {
+      if (micDisabledByShell) {
+        showLineShellBanner({ force: true });
+        toast('LINE 內建瀏覽器無法穩定使用語音輸入，請用瀏覽器開啟或使用文字輸入');
+        return;
+      }
       if (!SpeechRecognition) return;
       if (state.busy) {
         toast('上一句仍在翻譯中，請稍候');
@@ -3071,7 +3297,7 @@ Your task:
     // ========== Init ==========
     (async function init() {
       el.btnVerify.disabled = !state.apiKey;
-      if (!state.apiKey) setTimeout(() => openSettings(true), CONFIG.SETTINGS_AUTO_OPEN_DELAY_MS);
+      if (!state.apiKey && !shellInfo.isLine) setTimeout(() => openSettings(true, { apiKeyOnly: true }), CONFIG.SETTINGS_AUTO_OPEN_DELAY_MS);
       lockEditing();
       // Restore offline queue (persisted across tab close / reload)
       const restoredQueue = loadOfflineQueue();
