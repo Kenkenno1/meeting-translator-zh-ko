@@ -830,8 +830,8 @@
         <button class="btn-play" id="btnPlayJp" style="display:none">🔊</button>
       </div>
       <div class="input-actions">
-        <button class="btn-mic" id="btnMicJp">KR 發言</button>
-        <button class="btn-text" id="btnTextJp" aria-label="KR 文字輸入">打字</button>
+        <button class="btn-mic" id="btnMicJp">한국어로 말하기</button>
+        <button class="btn-text" id="btnTextJp" aria-label="한국어 텍스트 입력">입력</button>
       </div>
     </div>
 
@@ -2374,24 +2374,35 @@ Your task:
     };
 
     function micLabel(speaker) {
+      if (speaker === 'KR') return '한국어로 말하기';
       return `${speaker} 發言`;
     }
 
-    function micPendingLabel() {
-      return '⏳ 等待中…';
+    function micPendingLabel(speaker) {
+      return speaker === 'KR' ? '⏳ 대기 중…' : '⏳ 等待中…';
     }
 
-    function micStopLabel() {
-      return '⏹ 停止';
+    function micStopLabel(speaker) {
+      return speaker === 'KR' ? '⏹ 중지' : '⏹ 停止';
     }
 
     function textBtnLabel(speaker, active, hasText) {
+      if (speaker === 'KR') {
+        if (!active) return '입력';
+        if (hasText) return '번역';
+        return '취소';
+      }
       if (!active) return '打字';
       if (hasText) return '翻譯';
       return '取消';
     }
 
     function textBtnAriaLabel(speaker, active, hasText) {
+      if (speaker === 'KR') {
+        if (!active) return '한국어 텍스트 입력';
+        if (hasText) return '한국어 번역';
+        return '한국어 입력 취소';
+      }
       return active
         ? (hasText ? `${speaker} 翻譯文字` : `${speaker} 取消文字輸入`)
         : `${speaker} 文字輸入`;
@@ -2720,7 +2731,7 @@ Your task:
       }, CONFIG.MAX_RECORDING_MS);
 
       btn.classList.add('mic-pending');
-      btn.textContent = '⏳ 等待中…';
+      btn.textContent = micPendingLabel(speaker);
     }
 
     function stopMic() {
