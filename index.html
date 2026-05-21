@@ -2540,6 +2540,15 @@ Your task:
     // Mic permission is handled by the browser natively when SpeechRecognition.start() is called.
     // Do NOT call getUserMedia() proactively — it causes a double-prompt on file:// protocol.
 
+    function speechRuntimeInfo() {
+      const ua = navigator.userAgent || '';
+      const platform = navigator.userAgentData?.platform || navigator.platform || '';
+      const maxTouchPoints = Number(navigator.maxTouchPoints) || 0;
+      const androidUa = /Android/i.test(ua) || /Android/i.test(platform);
+      const linuxTouchChrome = /Linux/i.test(ua) && /(Chrome|Chromium|SamsungBrowser)/i.test(ua) && maxTouchPoints > 0;
+      return { ua, platform, maxTouchPoints, isAndroidLike: androidUa || linuxTouchChrome };
+    }
+
     if (!SpeechRecognition) {
       el.btnMicTw.disabled = true;
       el.btnMicJp.disabled = true;
@@ -2621,6 +2630,25 @@ Your task:
       let micGotEvent = false;
       let micSafetyTimer = null;
       let clearedTranscript = false;
+      const speechInfo = speechRuntimeInfo();
+      const isAndroidSpeech = speechInfo.isAndroidLike;
+      const mergeAndroidFinalParts = (parts) => {
+        if (!isAndroidSpeech || parts.length < 2) return parts;
+        const out = [];
+        for (const part of parts) {
+          const key = String(part || '').trim();
+          const prevKey = out.length ? String(out[out.length - 1] || '').trim() : '';
+          if (!key) continue;
+          if (key && key === prevKey) continue;
+          if (prevKey && key.startsWith(prevKey)) {
+            out[out.length - 1] = part;
+            continue;
+          }
+          if (prevKey && prevKey.startsWith(key)) continue;
+          out.push(part);
+        }
+        return out;
+      };
 
       const btn = speaker === 'TW' ? el.btnMicTw : el.btnMicJp;
       const otherBtn = speaker === 'TW' ? el.btnMicJp : el.btnMicTw;
@@ -2664,16 +2692,16 @@ Your task:
           translatedEl.textContent = '';
           clearedTranscript = true;
         }
-        let finalText = '';
-        let interim = '';
+        const finalParts = [];
+        const interimParts = [];
         for (let i = 0; i < event.results.length; i++) {
           const t = event.results[i][0].transcript;
-          if (event.results[i].isFinal) finalText += t;
-          else interim += t;
+          if (event.results[i].isFinal) finalParts.push(t);
+          else interimParts.push(t);
         }
-        finalTranscript = finalText;
-        lastInterim = interim;
-        translatedEl.textContent = finalTranscript + interim;
+        finalTranscript = mergeAndroidFinalParts(finalParts).join('');
+        lastInterim = interimParts.join('');
+        translatedEl.textContent = finalTranscript + lastInterim;
       };
 
       recognition.onerror = (event) => {
